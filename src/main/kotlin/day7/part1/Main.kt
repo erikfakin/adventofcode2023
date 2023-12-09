@@ -1,39 +1,77 @@
 package day7.part1
 
+import java.awt.List
 import java.io.File
+import java.util.Arrays
 import kotlin.io.path.Path
 import kotlin.math.*
 
 
+val cardsScore= "J23456789TQKA"
+class Hand(val cards: String, val bid: Int ){
+    var score:String = "0000"
+
+    init {
+        calculateScore()
+    }
+    private fun calculateScore(){
+        val sortedCards = cards.toCharArray().sorted()
+        val cardsMap : MutableMap<Char, Int> = mutableMapOf()
+        for(char in sortedCards) {
+            if (cardsMap[char] == 0) continue
+            cardsMap[char] = sortedCards.count { c: Char -> c == char }
+        }
+        for (i in 2..5) {
+            score = score.replaceRange(i-2, i-1, cardsMap.values.count { occurances -> occurances == i }.toString())
+
+        }
+        score = score.reversed()
+    }
+
+    override fun toString(): String {
+        return "Cards: $cards Score: $score Bid: $bid | "
+    }
+
+}
 fun readFile(filename: String): Int {
-    var sum = 1
+    var sum = 0
 
-    val input = File(filename).readLines()
-    val timesList = Regex("(\\d+)").findAll(input[0]).map { it.groupValues.first().toInt() }.toList()
-    val distancesList = Regex("(\\d+)").findAll(input[1]).map { it.groupValues.first().toInt() }.toList()
+    var handsList : MutableList<Hand> = mutableListOf()
 
-    distancesList.forEachIndexed{index, distance ->
+   File(filename).forEachLine { line ->
+        val cards =  line.split(" ").first()
+        val bid = line.split(" ").last().toInt()
+        val hand = Hand(cards, bid)
+        handsList.add(hand)
+    }
 
-        val det = sqrt(timesList[index].toDouble().pow(2) - 4*distance)
+    val cardsComparator = Comparator<Hand> { hand1, hand2 ->
+        val cards1 = hand1.cards.toCharArray()
+        val cards2 = hand2.cards.toCharArray()
+        var index = 0
+        while (index < cards1.size && index < cards2.size) {
+            val str1Char = cardsScore.indexOf(cards1[index])
+            val str2Char = cardsScore.indexOf(cards2[index])
 
-        val x1 = (timesList[index] - det)/2
-        val x2 = (timesList[index] + det)/2
+            if (str1Char < str2Char) {
+                return@Comparator -1
+            } else if (str1Char > str2Char) {
+                return@Comparator 1
+            }
 
-        val startInt = (floor(x1) + 1).toInt()
-        val endInt = (ceil(x2) - 1).toInt()
-//        if (x2 > timesList[index]) x2 = timesList[index].toDouble()
-        println("X1 $x1 X2 $x2")
-        println("startInt $startInt endInt $endInt")
-        println("${floor(x2) - ceil(x1)}")
-        sum *= endInt - startInt + 1
-
+            index++
+        }
+        return@Comparator cards1.size - cards2.size
     }
 
 
 
 
 
-
+    handsList = handsList.sortedWith(compareBy<Hand> { it.score }.then(cardsComparator)).toMutableList()
+    handsList.forEachIndexed { index, hand ->
+        sum+= (index + 1) * hand.bid
+    }
     return sum
 
 }
