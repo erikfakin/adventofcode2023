@@ -40,6 +40,6 @@ fun readFile(filename: String): Int {
 
 
 fun main(args: Array<String>) {
-    val inputPath = Path("src/main/kotlin/day4/part1/input.txt").toString()
+    val inputPath = Path("src/day11.day11.main/kotlin/day4/part1/input.txt").toString()
     println("RESULT: ${readFile(inputPath)}")
 }

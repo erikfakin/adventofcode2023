@@ -91,7 +91,7 @@ fun readFile(filename: String): Int {
 
 fun main(args: Array<String>) {
 
-    println("RESULT: ${readFile("src/main/kotlin/text.txt")}")
+    println("RESULT: ${readFile("src/day11.day11.main/kotlin/text.txt")}")
 
 
 }

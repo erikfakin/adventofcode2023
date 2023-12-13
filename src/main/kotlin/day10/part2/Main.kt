@@ -238,7 +238,7 @@ fun readFile(filename: String): Int {
 }
 
 fun main(args: Array<String>) {
-    val inputPath = Path("src/main/kotlin/day10/part2/input.txt").toString()
+    val inputPath = Path("src/day11.day11.main/kotlin/day10/part2/input.txt").toString()
     println("RESULT: ${readFile(inputPath)}")
 
 }
