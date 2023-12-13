@@ -3,6 +3,116 @@ package day10.part2
 import java.io.File
 import kotlin.io.path.Path
 
+
+fun isEnclosed(
+    pointPosition: IntArray,
+    map: MutableList<MutableList<Char>>,
+    notPathPoints: MutableList<IntArray>
+): Boolean {
+    /***
+     * for each dot go right and then up. If we cross some pipes an odd number of times in each direction,
+     * the dot is inside. If the number of times a pipe is crossed is even or 0, we are outside.
+     */
+    if (pointPosition[0] == map.first().size - 1) return false
+
+    var counter = 0
+    var bend = ""
+
+    for (i in 0..<map.first().size - pointPosition[0]) {
+        if (notPathPoints.none { point -> point[0] == pointPosition[0] + i && point[1] == pointPosition[1] }) {
+            println("Path crossed at ${pointPosition[0] + i} ${pointPosition[1]} ")
+            when (map[pointPosition[1]][pointPosition[0] + i]) {
+                'F' -> if (bend == "") {
+                    bend = "F"
+                    continue
+                }
+
+                'J' -> if (bend == "F") {
+                    counter++
+                    bend = ""
+                    continue
+                }  else if (bend == "L") {
+                    bend = ""
+                    continue
+                }
+
+                'L' -> if (bend == "") {
+                    bend = "L"
+                    continue
+                }
+
+                '7' -> if (bend == "L") {
+                    counter++
+                    bend = ""
+                    continue
+                } else if (bend == "F" ) {
+                    bend = ""
+                    continue
+                }
+                'S' -> {
+                    var isCharAboveConnectedToStart = false
+                    var isCharBelowConnectedToStart = false
+                    if (pointPosition[1] - 1 >= 0 && pointPosition[1] + 1 < map.size) {
+                        val charBelow = map[pointPosition[1] + 1][pointPosition[0] + i]
+                        val charAbove = map[pointPosition[1] - 1][pointPosition[0] + i]
+                        val isCharBelowInPath =
+                            notPathPoints.none { point -> point[0] == pointPosition[0] + i && point[1] == pointPosition[1] + 1 }
+                        val isCharAboveInPath =
+                            notPathPoints.none { point -> point[0] == pointPosition[0] + i && point[1] == pointPosition[1] - 1 }
+                        isCharAboveConnectedToStart =
+                            charArrayOf('|', '7', 'F').contains(charAbove) && isCharAboveInPath
+                        isCharBelowConnectedToStart =
+                            charArrayOf('|', 'J', 'L').contains(charBelow) && isCharBelowInPath
+                    }
+
+
+
+                    if(isCharAboveConnectedToStart && isCharBelowConnectedToStart){
+                        // char is |
+                        println("S is |")
+                        counter++
+                        continue
+                    } else if (isCharAboveConnectedToStart) {
+                        // either J or L
+                        if (bend=="") {
+                            println("S is L")
+                            bend = "L"
+                        } else {
+                            println("S is J")
+                            bend= "J"
+                        }
+                        continue
+                    } else if (isCharBelowConnectedToStart) {
+                        // either 7 or F
+                        if (bend=="") {
+                            println("S is F")
+                            bend = "F"
+                        } else {
+                            println("S is 7")
+                            bend = "7"
+                        }
+                        continue
+                    }
+                }
+
+                '-' -> continue
+            }
+
+            println("sadf")
+
+
+            counter++
+
+
+        }
+
+    }
+
+    println(counter)
+
+    return counter % 2 != 0
+}
+
 val directions = listOf(
     intArrayOf(1, 0),
 //    intArrayOf(1, -1),
@@ -57,74 +167,78 @@ fun validateMove(position: IntArray, direction: IntArray, map: MutableList<Mutab
 }
 
 
-fun readFile(filename: String): Long {
+fun readFile(filename: String): Int {
 
     val map = mutableListOf<MutableList<Char>>()
     var index = 0
     var position = intArrayOf(0, 0)
-    var currentDirections = mutableListOf<IntArray>()
+    val currentDirections = mutableListOf<IntArray>()
+
+    val notPathPoints = mutableListOf<IntArray>()
+    val enclosedPoints = mutableListOf<IntArray>()
+
+
+
+
     File(filename).forEachLine { line ->
         map.add(line.toMutableList())
         if (line.contains('S', true)) {
-
             position = intArrayOf(line.indexOf('S'), index)
         }
 
         index++
     }
 
-    map.forEach { println(it) }
+    map.forEachIndexed { rowIndex, row ->
+        row.forEachIndexed { columnIndex, column ->
+            notPathPoints.add(intArrayOf(columnIndex, rowIndex))
+        }
+    }
 
     directions.forEach { direction ->
         if (validateMove(position, direction, map)) currentDirections.add(direction)
-
     }
 
-    println("valid directions ${currentDirections[0][0]} ${currentDirections[0][1]}")
-    println("valid directions ${currentDirections[1][0]} ${currentDirections[1][1]}")
+    val currentPositions = mutableListOf<IntArray>(position, position)
+    notPathPoints.removeIf { point -> point[0] == currentPositions[0][0] && point[1] == currentPositions[0][1] }
 
-
-
-
-    var currentPositions = mutableListOf<IntArray>(position, position)
-//    currentPositions[0] = intArrayOf(currentPositions[0][0] + currentDirections[0][0], currentPositions[0][1] + currentDirections[0][1])
-//    currentPositions[1] = intArrayOf(currentPositions[1][0] + currentDirections[1][0], currentPositions[1][1] + currentDirections[1][1])
-    println("Starting at ${currentPositions[0][0]}  ${currentPositions[0][1]}")
-    println("Starting at ${currentPositions[1][0]}  ${currentPositions[1][1]}")
-
-
-    var steps = 0L
     while (true) {
-
 
         currentDirections[0] = nextDirection(currentPositions[0], currentDirections[0], map)
         currentDirections[1] = nextDirection(currentPositions[1], currentDirections[1], map)
 
-        currentPositions[0] = intArrayOf(currentPositions[0][0] + currentDirections[0][0], currentPositions[0][1] + currentDirections[0][1])
-        currentPositions[1] = intArrayOf(currentPositions[1][0] + currentDirections[1][0], currentPositions[1][1] + currentDirections[1][1])
+        currentPositions[0] = intArrayOf(
+            currentPositions[0][0] + currentDirections[0][0],
+            currentPositions[0][1] + currentDirections[0][1]
+        )
+        currentPositions[1] = intArrayOf(
+            currentPositions[1][0] + currentDirections[1][0],
+            currentPositions[1][1] + currentDirections[1][1]
+        )
 
 
-        println("Position 1: ${currentPositions[0][0]} ${currentPositions[0][1]}")
-        println("Position 2: ${currentPositions[1][0]} ${currentPositions[1][1]}")
+        notPathPoints.removeIf { point -> point[0] == currentPositions[0][0] && point[1] == currentPositions[0][1] }
+        notPathPoints.removeIf { point -> point[0] == currentPositions[1][0] && point[1] == currentPositions[1][1] }
 
-
-        if (currentPositions[0].contentEquals(currentPositions[1])) {
-            steps++
-            break
-        }
-        println("Position 1: ${currentPositions[0][0]} ${currentPositions[0][1]}")
-        println("Position 2: ${currentPositions[1][0]} ${currentPositions[1][1]}")
-        steps++
+        if (currentPositions[0].contentEquals(currentPositions[1])) break
 
     }
 
 
+    notPathPoints.forEach { println("not path at ${it[0]} ${it[1]}") }
 
+    notPathPoints.forEach { point ->
+        if (isEnclosed(point, map, notPathPoints)) enclosedPoints.add(point)
+    }
 
-    return steps
+    enclosedPoints.forEach { println("ECNLOSED POINT AT ${it[0]} ${it[1]}") }
+
+    return enclosedPoints.size
+
 }
 
 fun main(args: Array<String>) {
-    val inputPath = Path("src/main/kotlin/day10/part1/input.txt").toString()
+    val inputPath = Path("src/main/kotlin/day10/part2/input.txt").toString()
     println("RESULT: ${readFile(inputPath)}")
+
 }

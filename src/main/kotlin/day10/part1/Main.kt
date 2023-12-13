@@ -66,36 +66,20 @@ fun readFile(filename: String): Long {
     File(filename).forEachLine { line ->
         map.add(line.toMutableList())
         if (line.contains('S', true)) {
-
             position = intArrayOf(line.indexOf('S'), index)
         }
 
         index++
     }
 
-    map.forEach { println(it) }
-
     directions.forEach { direction ->
         if (validateMove(position, direction, map)) currentDirections.add(direction)
-
     }
 
-    println("valid directions ${currentDirections[0][0]} ${currentDirections[0][1]}")
-    println("valid directions ${currentDirections[1][0]} ${currentDirections[1][1]}")
-
-
-
-
     var currentPositions = mutableListOf<IntArray>(position, position)
-//    currentPositions[0] = intArrayOf(currentPositions[0][0] + currentDirections[0][0], currentPositions[0][1] + currentDirections[0][1])
-//    currentPositions[1] = intArrayOf(currentPositions[1][0] + currentDirections[1][0], currentPositions[1][1] + currentDirections[1][1])
-    println("Starting at ${currentPositions[0][0]}  ${currentPositions[0][1]}")
-    println("Starting at ${currentPositions[1][0]}  ${currentPositions[1][1]}")
-
 
     var steps = 0L
     while (true) {
-
 
         currentDirections[0] = nextDirection(currentPositions[0], currentDirections[0], map)
         currentDirections[1] = nextDirection(currentPositions[1], currentDirections[1], map)
@@ -103,23 +87,11 @@ fun readFile(filename: String): Long {
         currentPositions[0] = intArrayOf(currentPositions[0][0] + currentDirections[0][0], currentPositions[0][1] + currentDirections[0][1])
         currentPositions[1] = intArrayOf(currentPositions[1][0] + currentDirections[1][0], currentPositions[1][1] + currentDirections[1][1])
 
-
-        println("Position 1: ${currentPositions[0][0]} ${currentPositions[0][1]}")
-        println("Position 2: ${currentPositions[1][0]} ${currentPositions[1][1]}")
-
-
-        if (currentPositions[0].contentEquals(currentPositions[1])) {
-          steps++
-            break
-        }
-        println("Position 1: ${currentPositions[0][0]} ${currentPositions[0][1]}")
-        println("Position 2: ${currentPositions[1][0]} ${currentPositions[1][1]}")
         steps++
 
+        if (currentPositions[0].contentEquals(currentPositions[1])) break
+
     }
-
-
-
 
     return steps
 }
