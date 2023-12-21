@@ -1,36 +1,27 @@
-package day12_2
+package day12
 
 import java.io.File
 
-var cache = mutableMapOf<String, Long>()
-
-fun countArrangements(map: String, pattern:List<Int>):Long {
+fun countArrangements(map: String, pattern:List<Int>):Int {
     // Case we reach the end of the map and have no more pattern to match
     if (map.isEmpty()) {
-        return if (pattern.isEmpty()) {
-            1
+        if (pattern.isEmpty()) {
+            return 1
         } else {
-            0
+            return 0
         }
     }
 
     if (pattern.isEmpty()) {
-        return if (map.contains('#')) {
-            0
+        if (map.contains('#')) {
+            return 0
         } else {
-            1
+            return 1
         }
     }
 
-    val key = "$map%$pattern"
-
-    if (cache.containsKey(key)) {
-        return cache[key]!!
-    }
-
-
     val firstElement = map[0]
-    var count = 0L
+    var count = 0
 
     if (firstElement == '.' || firstElement == '?') {
         count += countArrangements(map.substring(1), pattern)
@@ -47,23 +38,16 @@ fun countArrangements(map: String, pattern:List<Int>):Long {
         }
 
     }
-    cache[key] = count
-
     return count
 
 }
 fun main() {
-    var res = 0L
+    var res = 0
 
     File("src/main/kotlin/day12/input.txt").forEachLine { line ->
 
-        var (row, patternString) = line.split(" ")
-
-        row = (row.plus("?")).repeat(5).dropLast(1)
-        patternString = patternString.plus(",").repeat(5).dropLast(1)
-
-
-        var pattern = patternString.split(",").map { it.toInt() }
+        val (row, patternString) = line.split(" ")
+        val pattern = patternString.split(",").map { it.toInt() }
         res += countArrangements(row, pattern)
 
 
