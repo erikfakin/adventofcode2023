@@ -33,13 +33,13 @@ fun readFile(filename: String): Int {
 
 
     File(filename).forEachLine {
-        val partMatches = Regex("(\\d+)").findAll(it)!!.forEach { m ->
+        val partMatches = Regex("(\\d+)").findAll(it).forEach { m ->
             val part = Part(m.groups.last()!!.value.toInt(), lineNumber, m.groups.last()?.range!!.first, m.groups.last()?.range!!.last)
             parts.add(part)
 
         }
 
-        val signalMatches = Regex("[^0-9.a-zA-Z]").findAll(it)!!.forEach { m ->
+        val signalMatches = Regex("[^0-9.a-zA-Z]").findAll(it).forEach { m ->
             println("GR ${m.groups}")
             val signal = Signal(m.groups.last()!!.value, m.groups.last()?.range!!.first, lineNumber)
             signals.add(signal)

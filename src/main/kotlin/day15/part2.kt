@@ -41,7 +41,7 @@ fun main() {
             }
         }
     }
-    boxesList.forEachIndexed() { boxIndex, box ->
+    boxesList.forEachIndexed { boxIndex, box ->
         if (box.isNotEmpty()) {
            box.forEachIndexed { lensPosition, lens ->
                result += (boxIndex + 1) * (lensPosition + 1) * lens.second }
