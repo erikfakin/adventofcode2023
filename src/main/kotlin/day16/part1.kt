@@ -10,7 +10,6 @@ fun march(direction: Pair<Int, Int>, position: Pair<Int, Int>, map: List<String>
     var currentPosition = position.copy()
 
     while (true) {
-        println("marching in direction $direction from $currentPosition")
         val newPosition = Pair(currentPosition.first + direction.first, currentPosition.second + direction.second)
         if (newPosition.first >= map.first().length || newPosition.first < 0) {
             return
@@ -19,7 +18,6 @@ fun march(direction: Pair<Int, Int>, position: Pair<Int, Int>, map: List<String>
             return
         }
         if (cache.contains("$newPosition$direction")) {
-            println("found cache hit")
             return
         }
         cache.add("$newPosition$direction")
@@ -28,9 +26,6 @@ fun march(direction: Pair<Int, Int>, position: Pair<Int, Int>, map: List<String>
 
         when (map[newPosition.second][newPosition.first]) {
             '/' -> {
-
-                println("found mirror at $newPosition")
-
                 if (direction.first != 0) {
                     march(Pair(0, -direction.first), newPosition, map)
                     return
@@ -40,9 +35,7 @@ fun march(direction: Pair<Int, Int>, position: Pair<Int, Int>, map: List<String>
                 }
             }
             '\\' -> {
-                println("found mirror \\ at $newPosition")
-
-                if (direction.first != 0) {
+                      if (direction.first != 0) {
                     march(Pair(0, direction.first), newPosition, map)
                     return
                 } else {
@@ -51,18 +44,14 @@ fun march(direction: Pair<Int, Int>, position: Pair<Int, Int>, map: List<String>
                 }
             }
             '-' -> {
-                println("found - at $newPosition")
-
-                if (direction.first == 0 && direction.second != 0) {
+                             if (direction.first == 0 && direction.second != 0) {
                     march(Pair(-1, 0), newPosition, map)
                     march(Pair(1, 0), newPosition, map)
                     return
                 }
             }
             '|' -> {
-                println("found | at $newPosition")
-
-                if (direction.second == 0) {
+                              if (direction.second == 0) {
                     march(Pair(0, -1), newPosition, map)
                     march(Pair(0, 1), newPosition, map)
                     return
@@ -85,7 +74,6 @@ fun main() {
     val initialPosition = Pair(-1, 0)
     val initialDirection = Pair(1, 0)
 
-    visited.add(Pair(0, 0))
     cache.add("$initialPosition$initialDirection")
 
     march(initialDirection, initialPosition, input)
