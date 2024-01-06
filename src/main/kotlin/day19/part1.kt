@@ -31,9 +31,6 @@ fun main() {
         while (true) {
             val conditions = currentWork!!.replace(Regex("[\\{\\}]"), "").split(",")
             for (i in 0..<conditions.size) {
-
-                println(conditions[i])
-
                 val nextStep = conditions[i].split(":").last()
                 val condition = conditions[i].split(":").first()
 
@@ -51,7 +48,6 @@ fun main() {
                 if (condition.contains("<")) {
                     val attribute = condition.split("<").first().first()
                     val maxValue = condition.split("<").last().toInt()
-                    println("Checking $attribute < $maxValue")
                     if (part[attribute]!! < maxValue) {
                         if (nextStep == "A") {
                             acceptedParts.add(part)
@@ -66,7 +62,6 @@ fun main() {
                 } else if (condition.contains(">")) {
                     val attribute = condition.split(">").first().first()
                     val minValue = condition.split(">").last().toInt()
-                    println("Checking $attribute > $minValue")
                     if (part[attribute]!! > minValue) {
                         if (nextStep == "A") {
                             acceptedParts.add(part)
@@ -76,7 +71,6 @@ fun main() {
                             return@forEach
                         }
                         currentWork = workflows[nextStep]
-                        println("Going to ${workflows[nextStep]}")
                         break
                     }
                 }
