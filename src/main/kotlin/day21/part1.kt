@@ -1,7 +1,7 @@
 package day21
 
 import java.io.File
-
+import kotlin.math.abs
 
 
 fun main() {
@@ -66,7 +66,7 @@ fun main() {
      */
     val oddOrEven = maxSteps % 2
     result = visitedPositions.count { pos ->
-        ((startingPos.first - pos.first) + (startingPos.second - pos.second)) % 2 == oddOrEven
+        (abs(pos.first - startingPos.first) + abs(pos.second - startingPos.second)) % 2 == oddOrEven
     }
 
 
